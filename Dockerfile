@@ -1,4 +1,7 @@
 FROM python:3.12
+ARG ALPHA_VANTAGE_API_KEY
+ENV ALPHA_VANTAGE_API_KEY=$ALPHA_VANTAGE_API_KEY
+
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

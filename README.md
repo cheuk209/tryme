@@ -10,14 +10,6 @@ The focus will be on code quality, tests, documentation and quality of the deplo
 don’t expect you to deploy to paid tiers, but please document how things would be different for a
 production app.
 
-### Services
-To architect my solution, I want to outline the services I would use on Azure:
-
-1. FastAPI: For ease of developing an API capable of data validation and async work
-2. Azure Web Service: Nice integration with Python frameworks
-3. GitHub Actions: For source control, CI/CD pipelines, and project management
-4. Azure Key Vault: to store sensitive info IE my API key from Alpha Vantage
-
 
 ## High-level plan of implementation
 I tried to be verbose and comprehensive in this documentation, so I will include both implementation, assumptions I have made, and reasoning behind the architectural decisions I have made.
@@ -74,37 +66,16 @@ For each cloud service I used, I used best practice with their [naming conventio
 
 I began to authenticate Azure Web App for Github Actions, in order to generate deployment credentials. I created an active directory application, which is used as an identity to assign permissions for managing Azure resources.
 
-Documentation:
+### Azure Web App
+There were many options to deploy a containerised application, including container instances, serverless functions etc... I chose Web App simply because Edge Connect uses it already and I want to demonstrate I have working knowledge of it. 
 
-Use tools like Swagger/OpenAPI for API documentation
-Write clear README files and inline code comments
-Document the architecture and deployment process
+Limitations of using free tier prevents me from enabling a lot of features I would use in a production environment, for example using multiple layers of deployment slots, so that we can enable rolling upgrade or rollbacks. 
 
+I would also set auto-scaling groups so it can scale out to meet traffic demands. Since we are working with an API, we can also use API management to apply rate limiting to prevent abuses or malicious usage. 
 
-Set up CI/CD pipeline in Azure DevOps or GitHub Actions:
+At the moment, there is only the default log stream enabled for web app. I would use custom logging and monitoring solutions for better safeguarding. 
 
-Implement build, test, and deploy stages
-Run tests and code analysis (e.g., pylint, flake8) in the pipeline
-Deploy to different environments (dev, staging, production)
+On the security front, I would employ a mixture of WAF, network security groups. Again, the free tier doesn't allow for HTTPS/SSL, so the data is not encrypted. 
 
+There are too many things I can do to improve availability and resiliency, but for the purpose of deploying to a free-tier SKU, I will forego them.
 
-Secure the application:
-
-Implement proper authentication and authorization
-Use Azure Key Vault to store secrets
-Implement HTTPS and proper security headers
-
-
-Monitoring and logging:
-
-Set up Application Insights for telemetry and logging
-Implement proper error handling and logging throughout the application
-
-
-Scalability and performance:
-
-Implement caching where appropriate (e.g., Azure Cache for Redis in production)
-Consider using Azure Front Door or Azure CDN for production environments
-
-## Setting up local env
-`python3 -m venv venv` to create virtual environment. 

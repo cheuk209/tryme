@@ -27,7 +27,8 @@
 name: Build and deploy a container to an Azure Web App
 
 env:
-  AZURE_WEBAPP_NAME: app-edgeconnect  # set this to the name of your Azure Web App
+  AZURE_WEBAPP_NAME: app-edgeconnect
+  ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
 
 on:
   push:
@@ -54,6 +55,8 @@ jobs:
           load: true
           tags: app:test
           file: ./Dockerfile
+          build-args: |
+            ALPHA_VANTAGE_API_KEY=${{ secrets.ALPHA_VANTAGE_API_KEY }}
 
       - name: Run tests
         run: docker run --rm app:test pytest
@@ -82,6 +85,8 @@ jobs:
           push: true
           tags: ${{ secrets.ACR_REGISTRY }}/${{ github.repository }}:${{ github.sha }}
           file: ./Dockerfile
+          build-args: |
+            ALPHA_VANTAGE_API_KEY=${{ secrets.ALPHA_VANTAGE_API_KEY }}
 
   deploy:
     runs-on: ubuntu-latest
