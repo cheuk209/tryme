@@ -14,17 +14,16 @@ production app.
 To architect my solution, I want to outline the services I would use on Azure:
 
 1. FastAPI: For ease of developing an API capable of data validation and async work
-
-2. Azure Web Service: Nice integration with most Python frameworks
-
-3. GitHub Actions: For source control, CI/CD pipelines, and project management (decided against it)
-
+2. Azure Web Service: Nice integration with Python frameworks
+3. GitHub Actions: For source control, CI/CD pipelines, and project management
 4. Azure Key Vault: to store sensitive info IE my API key from Alpha Vantage
 
 
 ## High-level plan of implementation
+I tried to be verbose and comprehensive in this documentation, so I will include both implementation, assumptions I have made, and reasoning behind the architectural decisions I have made.
+
 ### Application design
-Started developing the application using FastAPI. Given the actual task is very simply, there is nothing stopping me from writing all of my code on a singular `main.py`, however I will use design patterns to best structure my code so it looks clean, scalable and evolvable.
+Started developing the application using FastAPI. Given the actual task is very simple, there is nothing stopping me from writing all of my code on a singular `main.py`, however I will use design patterns to best structure my code so it looks clean, scalable and evolvable.
 
 The project is divided into different modules (API, Core, Services, Models). The separation of concern makes the code more modular, easier to maintain, easier to test. 
 
@@ -36,7 +35,9 @@ The `service` directory will contain the business logic of my application. This 
 
 The `models` directory will contain my data models, as we will be using Pydantic for data validation. I used models to define and validate the response we get from the API. This also helps out testing later, as I have a clear idea of what the data types I will be working with.
 
-`fastapi dev main.py` to run the application in dev server. `fastapi run main.py` for production server. Production server makes sure of Uvicorn, and you can configure it to have multiple workers. 
+`fastapi dev main.py` to run the application in dev server. 
+
+`fastapi run main.py` for production server. Production server makes sure of Uvicorn, and you can easily configure it to have multiple workers. 
 
 ### Testing
 Testing is relatively easy to simply for FastAPI applications. As we are dealing with incredibly simple logic, the tests were quite straight forward. I defined some happy paths and bad paths, and was able to catch some errors that prompted me to improve my data validators even further. 
@@ -63,8 +64,15 @@ I then build and run it locally, to see that it works. `docker run -p 80:80 --en
 ### CICD Pipeline
 Now that I have a containerised application, I will use Github Actions to set up a CICD pipeline with automated tests, injection from Azure Secret Vault, and of course, build and deploy to Azure App Service.
 
+I did not set up proper branching strategy, so all of the changes are instantly merged into production. Clearly, in a production environment, I would have multiple environments with the correct branching strategies to support a CICD pipeline.
+
 ### KEY CONSIDERATION
 Now that I need to work with various Azure components, I must stress in a production environment, I would definitely use Infrastructure As Code tooling like Terraform to automate the creation of Azure resources. But after careful consideration and discussion with Arnaud, I think it would be best if I focus on code quality + deployment methods. Obviously, IaC is essential for long term scalability and maintainability in an actual production environment.  
+
+### Cloud resource creation
+For each cloud service I used, I used best practice with their [naming convention](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations). I used a resource group to contain all the resources I will manage for this application. There will be a container registry to host my Docker images, a key vault to host my API key, and then finally my actual web app will be deployed using App Service. 
+
+I began to authenticate Azure Web App for Github Actions, in order to generate deployment credentials. I created an active directory application, which is used as an identity to assign permissions for managing Azure resources.
 
 Documentation:
 
