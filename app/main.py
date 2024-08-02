@@ -4,7 +4,6 @@ from app.core.config import settings
 
 app = FastAPI()
 app.include_router(commodity_data.router, prefix="/api/v1")
-ALPHA_VANTAGE_API_KEY = "ZUTMJQV502645BUD"
 
 @app.get("/")
 async def read_root():

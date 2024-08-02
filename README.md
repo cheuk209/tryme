@@ -45,13 +45,26 @@ For example, some old data for commodities has value ".", which meant we have to
 
 Run `pytest` to see see all tests pass. 
 
+In a production environment, I would also try to set up some measure of code coverage, ensuring we have a good amount of tests covering our logic.
+
 ### Local Build and Run
 I could have created a Makefile and contain make commands to run locally. 
 
 Ie `make run` to run the application, `make test` to initiate pytest straight away. This would be neat to implement but not too important, so I have skipped to prioritise on more important stuff. 
 
+### API key storage
+In the application's core settings, I configured the application to load the API key from a local environment variable in the `.env` file. This approach enhances security by ensuring that the API key is not hardcoded directly in the codebase. Additionally, when deploying to an Azure Web App, the environment variable will be stored in Azure key vault, so that it can be safely injected during the deployment process.
+
 ### Container runtime 
 I use Docker to containerise the application. This just ensures portability and compatibility to run on any cloud platform/servers. 
+
+I then build and run it locally, to see that it works. `docker run -p 80:80 --env-file .env my-fastapi-app`
+
+### CICD Pipeline
+Now that I have a containerised application, I will use Github Actions to set up a CICD pipeline with automated tests, injection from Azure Secret Vault, and of course, build and deploy to Azure App Service.
+
+### KEY CONSIDERATION
+Now that I need to work with various Azure components, I must stress in a production environment, I would definitely use Infrastructure As Code tooling like Terraform to automate the creation of Azure resources. But after careful consideration and discussion with Arnaud, I think it would be best if I focus on code quality + deployment methods. Obviously, IaC is essential for long term scalability and maintainability in an actual production environment.  
 
 Documentation:
 
