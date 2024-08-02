@@ -1,5 +1,5 @@
 import httpx
-from app.models.commodity_data import Commodity, Interval
+from app.models.commodity_data import Commodity, Interval, CommodityData
 
 class AlphaVantageService:
     def __init__(self):
@@ -15,4 +15,12 @@ class AlphaVantageService:
         async with httpx.AsyncClient() as client:
             response = await client.get(self.base_url, params=params)
             response.raise_for_status()
-            return response.json()
+            print("this is what alpha vantage service actually return", response.json())
+            data = response.json()
+            return Commodity(
+                name = data["name"],
+                interval = interval,
+                unit = data["unit"],
+                data = [CommodityData(**item) for item in data["data"]]
+            )
+            

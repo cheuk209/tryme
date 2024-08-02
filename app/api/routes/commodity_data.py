@@ -4,8 +4,11 @@ from app.models.commodity_data import *
 from time import sleep
 from typing import Optional
 from datetime import datetime
+from app.core.config import logging
 
 router = APIRouter()
+
+logger = logging.getLogger(__name__)
 
 @router.get("/commodity/{function}", response_model=Commodity)
 async def get_commodity_data(
@@ -18,18 +21,12 @@ async def get_commodity_data(
     """
     This function retrieves commodity prices
     """
-    print(f"Received request for {function} with interval {interval}")
+    logger.info(f"Received request for {function} with interval {interval}")
     try:
-        data = await alpha_vantage_service.get_commodity_data(function, interval) 
+        commodity_response = await alpha_vantage_service.get_commodity_data(function, interval) 
         
-        commodity_response = Commodity(
-            name = data["name"],
-            interval = interval,
-            unit = data["unit"],
-            data = [CommodityData(**item) for item in data["data"]]
-        )
-        print("commodity_response is: ", commodity_response.data)
         if start_date or end_date:
+            logger.info(f"Retrieving data inbetween the {start_date} and {end_date}")
             start = datetime.strptime(start_date, "%Y-%m-%d") if start_date else None
             end = datetime.strptime(end_date, "%Y-%m-%d") if end_date else None
             filtered_data = [
@@ -42,10 +39,10 @@ async def get_commodity_data(
         return commodity_response
 
     except ValueError as e:
-        print(f"ValueError: {e}")
+        logger.exception(e)
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        print(f"Unexpected error: {e}")
+        logger.exception(e)
         raise HTTPException(status_code=500, detail="An unexpected error occurred")
 
 @router.get("/sleep")
