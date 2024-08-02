@@ -11,6 +11,7 @@ class AlphaVantageService:
 
     async def get_commodity_data(self, function: str, interval: Interval) -> Commodity:
         logger.info(f"Fetching commodity data for function: {function}, interval: {interval}")
+        logger.info(f"Using API key: {self.api_key}")
         params = {
             "function": function,
             "interval": interval.value,

@@ -7,12 +7,9 @@ from logging.handlers import RotatingFileHandler
 load_dotenv()
 
 class Settings(BaseSettings):
-    ALPHA_VANTAGE_API_KEY: str = os.getenv("ALPHA_VANTAGE_API_KEY", "")
+    ALPHA_VANTAGE_API_KEY: str = ""
     class Config:
         env_file = ".env"
-    
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
 
 
 # Logging files locally
